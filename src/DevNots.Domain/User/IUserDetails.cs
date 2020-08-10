@@ -1,3 +1,5 @@
+using System;
+
 namespace DevNots.Domain
 {
     public interface IUserDetails
@@ -7,5 +9,6 @@ namespace DevNots.Domain
         string Email { get; }
         string Username { get; }
         string Password { get; }
+        DateTime CreatedAt { get; }
     }
 }

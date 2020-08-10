@@ -1,7 +1,7 @@
 namespace DevNots.Domain
 {
-    public class DbContext
+    public abstract class DbContext
     {
-        // TODO: Finish this later with collections like IDbCollection<User>
+        public abstract IDbCollection<User> Users { get; }
     }
 }
