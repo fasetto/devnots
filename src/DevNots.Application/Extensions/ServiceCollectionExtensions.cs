@@ -2,8 +2,10 @@ using AutoMapper;
 using DevNots.Application.Contracts;
 using DevNots.Application.Mapping;
 using DevNots.Application.Repositories;
+using DevNots.Application.Services;
 using DevNots.Application.Validations;
 using DevNots.Domain;
+using DevNots.MongoDb;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +34,16 @@ namespace DevNots.Application.Extensions
             return services
                 .AddSingleton(mapper)
                 .AddScoped<IValidator<UserDto>, UserValidator>()
+                .AddScoped<UserService>()
                 .AddScoped<IUserRepository, UserRepository>();
+        }
+
+        public static IServiceCollection AddMongoDb(this IServiceCollection services, string connectionStrig)
+        {
+            var dbContext = new MongoDbContext(connectionStrig);
+
+            return services
+                .AddSingleton<DbContext>(dbContext);
         }
     }
 }

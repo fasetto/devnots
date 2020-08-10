@@ -16,37 +16,37 @@ namespace DevNots.Application.Repositories
 
         public Task<string> CreateAsync(User aggregate)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.CreateAsync(aggregate);
         }
 
         public Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.FindAsync(predicate);
         }
 
         public Task<User> FindOneAsync(Expression<Func<User, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.FindOneAsync(predicate);
         }
 
         public Task<User> GetByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.GetByIdAsync(id);
         }
 
         public Task<IEnumerable<User>> PaginateAsync(int page, int pageSize)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.PaginateAsync(page, pageSize);
         }
 
-        public Task RemoveAsync(string id)
+        public Task<bool> RemoveAsync(string id)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.RemoveAsync(id);
         }
 
-        public Task UpdateAsync(string id, User aggregate)
+        public Task<bool> UpdateAsync(string id, User aggregate)
         {
-            throw new NotImplementedException();
+            return dbContext.Users.UpdateAsync(id, aggregate);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevNots.Application.Contracts;
@@ -39,6 +40,50 @@ namespace DevNots.Application.Services
             var id = await userRepository.CreateAsync(user);
 
             response.Result = id;
+            return response;
+        }
+
+        public async Task<AppResponse> DeleteUserAsync(DeleteUserDto request)
+        {
+            var response = new AppResponse();
+
+            var isSuccess = await userRepository.RemoveAsync(request.Id);
+
+            if (!isSuccess)
+            {
+                var errorMessage = "User not found.";
+                return ErrorResponse(errorMessage, 404, response);
+            }
+
+            return response;
+        }
+
+        public async Task<AppResponse<IEnumerable<UserDto>>> GetUsersAsync(UserListDto request)
+        {
+            var response = new AppResponse<IEnumerable<UserDto>>();
+
+            if (request.Limit > 49 || request.Limit < 1)
+            {
+                var errorMessage = "limit must between 1-50";
+                return ErrorResponse(errorMessage, 400, response);
+            }
+
+            return await PaginateAsync(1, request.Limit);
+        }
+
+        public async Task<AppResponse<IEnumerable<UserDto>>> PaginateAsync(int page, int pageSize)
+        {
+            var response = new AppResponse<IEnumerable<UserDto>>();
+
+            if (pageSize > 49)
+            {
+                var errorMessage = "pageSize can not be greater than 50";
+                return ErrorResponse(errorMessage, 400, response);
+            }
+
+            var users = await userRepository.PaginateAsync(page, pageSize);
+
+            response.Result = mapper.Map<IEnumerable<UserDto>>(users);
             return response;
         }
 

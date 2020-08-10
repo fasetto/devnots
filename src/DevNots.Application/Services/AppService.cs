@@ -12,7 +12,18 @@ namespace DevNots.Application.Services
                 Message = errorMessage,
             };
 
-            return (AppResponse<TResult>) response;
+            return response;
+        }
+
+        protected AppResponse ErrorResponse(string errorMessage, int statusCode, AppResponse response)
+        {
+            response.Error = new RequestError()
+            {
+                StatusCode = statusCode,
+                Message    = errorMessage,
+            };
+
+            return response;
         }
     }
 }
