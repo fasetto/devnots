@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using DevNots.Application.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +28,11 @@ namespace DevNots.RestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var appConfig = ReadAppConfig();
+
+            services.AddSingleton(appConfig);
+            services.AddApplicationDependencies();
+            services.AddMongoDb(appConfig.ConnectionString);
             services.AddControllers();
         }
 
@@ -46,6 +54,23 @@ namespace DevNots.RestApi
             {
                 endpoints.MapControllers();
             });
+        }
+
+        public AppConfig ReadAppConfig()
+        {
+            var path = "./appConfig.json";
+
+            #if DEBUG
+                path = "../../appConfig.json";
+            #endif
+
+            var appConfigJson = File.ReadAllText(path);
+            var serializerOptions = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+
+            return JsonSerializer.Deserialize<AppConfig>(appConfigJson, serializerOptions);
         }
     }
 }
