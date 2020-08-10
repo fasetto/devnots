@@ -11,8 +11,8 @@ namespace DevNots.Domain
         Task<TAggregate> GetByIdAsync(string id);
         Task<IEnumerable<TAggregate>> PaginateAsync(int page, int pageSize);
         Task<string> CreateAsync(TAggregate aggregate);
-        Task RemoveAsync(string id);
-        Task UpdateAsync(string id, TAggregate aggregate);
+        Task<bool> RemoveAsync(string id);
+        Task<bool> UpdateAsync(string id, TAggregate aggregate);
         Task<IEnumerable<TAggregate>> FindAsync(Expression<Func<TAggregate, bool>> predicate);
         Task<TAggregate> FindOneAsync(Expression<Func<TAggregate, bool>> predicate);
     }
