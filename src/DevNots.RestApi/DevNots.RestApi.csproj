@@ -2,6 +2,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DevNots.Application\DevNots.Application.csproj" />
+
+    <Content Include="../../appConfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup>
