@@ -14,8 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
 
     - name: Create appConfig file
       run: echo $APP_CONFIG_ENC | base64 -d > appConfig.json
@@ -28,3 +26,4 @@ jobs:
         ssh-private-key: ${{ secrets.DOKKU_DEPLOY_KEY }}
         dokku-host: "dokku.fabyo.net"
         app-name: "devnots-api"
+        git-push-flags: "--force"
