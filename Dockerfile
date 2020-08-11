@@ -5,6 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN cp ./DOKKU_SCALE ./app
+RUN cp ./appConfig.json ./app
 RUN dotnet restore
 RUN dotnet publish DevNots.sln -c Release -o build --no-restore
 
