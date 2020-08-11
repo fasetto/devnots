@@ -20,6 +20,7 @@ jobs:
     - name: Add appConfig file
       run: |
         echo $APP_CONFIG_ENC | base64 -d > appConfig.json
+        sed -i "s/appConfig.json//g" .gitignore
         git config user.email "serkanbircan21@yandex.com"
         git config user.name fasetto
         git add .
