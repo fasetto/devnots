@@ -19,9 +19,7 @@ namespace DevNots.MongoDb
         public async Task<string> CreateAsync(User candidate)
         {
             await collection.InsertOneAsync(candidate).ConfigureAwait(false);
-            var user = await FindOneAsync(x => x.Email == candidate.Email);
-
-            return user.Id;
+            return candidate.Id;
         }
 
         public async Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate)
