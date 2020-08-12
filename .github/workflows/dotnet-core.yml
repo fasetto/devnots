@@ -12,11 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Create appConfig file
-      run: echo $APP_CONFIG_ENC | base64 -d > appConfig.json
-      env:
-        APP_CONFIG_ENC: ${{secrets.APP_CONFIG_ENC}}
-
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

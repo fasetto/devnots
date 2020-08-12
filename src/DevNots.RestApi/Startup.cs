@@ -28,11 +28,18 @@ namespace DevNots.RestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var appConfig = ReadAppConfig();
+            // var appConfig = ReadAppConfig();
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STR");
 
-            services.AddSingleton(appConfig);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                Console.WriteLine("Environment variable 'CONNECTION_STR' is not set. \nExiting..");
+                Environment.Exit(0);
+            }
+
+            // services.AddSingleton(appConfig);
             services.AddApplicationDependencies();
-            services.AddMongoDb(appConfig.ConnectionString);
+            services.AddMongoDb(connectionString);
             services.AddControllers();
         }
 

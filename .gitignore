@@ -3,7 +3,6 @@
 ##
 
 tests/coverage/*
-appConfig.json
 
 # User-specific files
 *.rsuser

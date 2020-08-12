@@ -17,21 +17,9 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Add appConfig file
-      run: |
-        echo $APP_CONFIG_ENC | base64 -d > appConfig.json
-        sed -i "s/appConfig.json//g" .gitignore
-        git config user.email "serkanbircan21@yandex.com"
-        git config user.name fasetto
-        git add .
-        git commit -m "added appConfig file for deploy"
-      env:
-        APP_CONFIG_ENC: ${{ secrets.APP_CONFIG_ENC }}
-
     - name: deploy
-      uses: idoberko2/dokku-deploy-github-action@v1
+      uses: fasetto/dokku-deploy@master
       with:
-        ssh-private-key: ${{ secrets.DOKKU_DEPLOY_KEY }}
+        dokku-deploy-key: ${{ secrets.DOKKU_DEPLOY_KEY }}
         dokku-host: "dokku.fabyo.net"
-        app-name: "devnots-api"
-        git-push-flags: "--force"
+        dokku-app: "devnots-api"

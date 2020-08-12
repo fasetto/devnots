@@ -4,10 +4,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN cp ./DOKKU_SCALE ./app
-RUN cp ./appConfig.json ./app
-RUN dotnet restore
-RUN dotnet publish DevNots.sln -c Release -o build --no-restore
+RUN dotnet restore && \
+    dotnet publish DevNots.sln -c Release -o build --no-restore && \
+    cp ./DOKKU_SCALE /app/build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 as runtime
 
