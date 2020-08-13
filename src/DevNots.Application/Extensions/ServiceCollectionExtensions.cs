@@ -40,7 +40,6 @@ namespace DevNots.Application.Extensions
                 .AddScoped<IValidator<NoteDto>, NoteValidator>()
                 .AddScoped<NoteService>()
                 .AddScoped<INoteRepository,NoteRepository>();
-            ;
         }
 
         public static IServiceCollection AddMongoDb(this IServiceCollection services, string connectionStrig)
