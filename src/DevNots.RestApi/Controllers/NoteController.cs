@@ -86,7 +86,7 @@ namespace DevNots.RestApi.Controllers
             if (!isUpdated)
                 return NotFound(new { message = "404 not found."});
 
-            return Ok(new { message = "user updated." });
+            return Ok(new { message = "note updated." });
         }
     }
 }
