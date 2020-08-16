@@ -27,8 +27,10 @@ namespace DevNots.Application.Tests
             mapper = mapperConfig.CreateMapper();
 
             registerUserValidator = new RegisterUserValidator();
-            userRepoMock  = new Mock<IUserRepository>();
-            userService   = new UserService(
+            updateUserValidator   = new UpdateUserValidator();
+            userRepoMock          = new Mock<IUserRepository>();
+
+            userService = new UserService(
                 mapper,
                 userRepoMock.Object,
                 registerUserValidator,
