@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.User;
+using DevNots.Application.Validations;
 using DevNots.Domain;
 using FluentValidation;
 
@@ -11,24 +11,31 @@ namespace DevNots.Application.Services
 {
     public class UserService: AppService
     {
-        private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
-        private readonly IValidator<UserDto> validator;
-        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<UserDto> validator)
+        private readonly IUserRepository userRepository;
+        private readonly RegisterUserValidator registerUserValidator;
+        private readonly UpdateUserValidator updateUserValidator;
+        public UserService(
+            IMapper mapper,
+            IUserRepository userRepository,
+            RegisterUserValidator registerUserValidator,
+            UpdateUserValidator updateUserValidator
+        )
         {
             this.mapper = mapper;
-            this.validator = validator;
             this.userRepository = userRepository;
+            this.registerUserValidator = registerUserValidator;
+            this.updateUserValidator = updateUserValidator;
         }
 
         /// <summary>
         /// Registers given user to the database.
         /// </summary>
-        /// <param name="userDto">User to register</param>
+        /// <param name="request">User to register</param>
         /// <returns>Id of the registered user</returns>
-        public async Task<AppResponse<string>> RegisterAsync(UserDto userDto)
+        public async Task<AppResponse<string>> RegisterAsync(RegisterUserRequest request)
         {
-            var validationResult = validator.Validate(userDto);
+            var validationResult = registerUserValidator.Validate(request);
             var response = new AppResponse<string>();
 
             if (validationResult.Errors.Any())
@@ -37,16 +44,19 @@ namespace DevNots.Application.Services
                 return ErrorResponse(errorMessage, 400, response);
             }
 
-            var user = mapper.Map<User>(userDto);
+            var user = mapper.Map<User>(request);
             var id = await userRepository.CreateAsync(user);
 
             response.Result = id;
             return response;
         }
 
-        public async Task<AppResponse> DeleteUserAsync(DeleteUserDto request)
+        public async Task<AppResponse> DeleteUserAsync(DeleteUserRequest request)
         {
             var response = new AppResponse();
+
+            if (string.IsNullOrEmpty(request.Id))
+                return ErrorResponse("Id can not be empty.", 400, response);
 
             var isSuccess = await userRepository.RemoveAsync(request.Id);
 
@@ -59,38 +69,9 @@ namespace DevNots.Application.Services
             return response;
         }
 
-        public async Task<AppResponse<IEnumerable<UserDto>>> GetUsersAsync(UserListDto request)
+        public async Task<AppResponse<bool>> UpdateUserAsync(UpdateUserRequest request)
         {
-            var response = new AppResponse<IEnumerable<UserDto>>();
-
-            if (request.Limit > 49 || request.Limit < 1)
-            {
-                var errorMessage = "limit parameter must between 1-50";
-                return ErrorResponse(errorMessage, 400, response);
-            }
-
-            return await PaginateAsync(1, request.Limit);
-        }
-
-        public async Task<AppResponse<IEnumerable<UserDto>>> PaginateAsync(int page, int pageSize)
-        {
-            var response = new AppResponse<IEnumerable<UserDto>>();
-
-            if (page < 1 || pageSize > 49 || pageSize < 1)
-            {
-                var errorMessage = "pageSize parameter must between 1-50 and page parameter must be positive value.";
-                return ErrorResponse(errorMessage, 400, response);
-            }
-
-            var users = await userRepository.PaginateAsync(page, pageSize);
-
-            response.Result = mapper.Map<IEnumerable<UserDto>>(users);
-            return response;
-        }
-
-        public async Task<AppResponse<bool>> UpdateUserAsync(UserDto userDto)
-        {
-            var validationResult = validator.Validate(userDto);
+            var validationResult = updateUserValidator.Validate(request);
             var response = new AppResponse<bool>();
 
             if (validationResult.Errors.Any())
@@ -98,11 +79,9 @@ namespace DevNots.Application.Services
                 var errorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
                 return ErrorResponse(errorMessage, 400, response);
             }
-            if (string.IsNullOrEmpty(userDto.Id))
-                return ErrorResponse("Id can not be empty.", 400, response);
 
-            var user = mapper.Map<User>(userDto);
-            var isUpdated = await userRepository.UpdateAsync(userDto.Id, user);
+            var user = mapper.Map<User>(request);
+            var isUpdated = await userRepository.UpdateAsync(request.Id, user);
 
             response.Result = isUpdated;
             return response;

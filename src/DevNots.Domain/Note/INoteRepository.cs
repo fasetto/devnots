@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DevNots.Domain.Note
+namespace DevNots.Domain
 {
     public interface INoteRepository:IAsyncRepository<Note>
     {

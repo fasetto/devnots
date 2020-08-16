@@ -1,17 +1,10 @@
 using AutoMapper;
-using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.Keyword;
-using DevNots.Application.Contracts.Note;
-using DevNots.Application.Contracts.User;
 using DevNots.Application.Mapping;
 using DevNots.Application.Repositories;
 using DevNots.Application.Services;
 using DevNots.Application.Validations;
 using DevNots.Domain;
-using DevNots.Domain.Keyword;
-using DevNots.Domain.Note;
 using DevNots.MongoDb;
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DevNots.Application.Extensions
@@ -38,15 +31,16 @@ namespace DevNots.Application.Extensions
 
             return services
                 .AddSingleton(mapper)
-                .AddScoped<IValidator<UserDto>, UserValidator>()
-                .AddScoped<UserService>()
+
+                .AddScoped<RegisterUserValidator>()
+                .AddScoped<UpdateUserValidator>()
                 .AddScoped<IUserRepository, UserRepository>()
-                .AddScoped<IValidator<NoteDto>, NoteValidator>()
-                .AddScoped<NoteService>()
-                .AddScoped<INoteRepository,NoteRepository>()
-                .AddScoped<IValidator<KeywordDto>,KeywordValidator>()
-                .AddScoped<KeywordService>()
-                .AddScoped<IKeywordRepository,KeywordRepository>();
+                .AddScoped<UserService>()
+
+                .AddScoped<AddNoteValidator>()
+                .AddScoped<UpdateNoteValidator>()
+                .AddScoped<INoteRepository, NoteRepository>()
+                .AddScoped<NoteService>();
         }
 
         public static IServiceCollection AddMongoDb(this IServiceCollection services, string connectionStrig)

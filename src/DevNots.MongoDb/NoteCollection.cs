@@ -1,5 +1,4 @@
 using DevNots.Domain;
-using DevNots.Domain.Note;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -55,6 +54,11 @@ namespace DevNots.MongoDb
 
         public async Task<bool> UpdateAsync(string id, Note aggregate)
         {
+            var isValidId = ObjectId.TryParse(id, out _);
+
+            if (!isValidId)
+                return false;
+
             var _note =await collection.ReplaceOneAsync(x => x.Id == id, aggregate);
             return _note.IsModifiedCountAvailable;
         }

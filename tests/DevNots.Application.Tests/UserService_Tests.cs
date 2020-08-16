@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.User;
 using DevNots.Application.Mapping;
 using DevNots.Application.Services;
 using DevNots.Application.Validations;
@@ -16,7 +13,8 @@ namespace DevNots.Application.Tests
     public class UserService_Tests
     {
         private readonly IMapper mapper;
-        private readonly UserValidator userValidator;
+        private readonly RegisterUserValidator registerUserValidator;
+        private readonly UpdateUserValidator updateUserValidator;
         private readonly Mock<IUserRepository> userRepoMock;
         private readonly UserService userService;
         public UserService_Tests()
@@ -28,9 +26,14 @@ namespace DevNots.Application.Tests
 
             mapper = mapperConfig.CreateMapper();
 
-            userValidator = new UserValidator();
+            registerUserValidator = new RegisterUserValidator();
             userRepoMock  = new Mock<IUserRepository>();
-            userService   = new UserService(userRepoMock.Object, mapper, userValidator);
+            userService   = new UserService(
+                mapper,
+                userRepoMock.Object,
+                registerUserValidator,
+                updateUserValidator
+            );
         }
 
         [Fact]
@@ -40,7 +43,7 @@ namespace DevNots.Application.Tests
             userRepoMock.Setup(x => x.CreateAsync(It.IsAny<User>()))
                 .Returns(Task.FromResult("id"));
 
-            var user = new UserDto()
+            var user = new RegisterUserRequest()
             {
                 Email    = "serkanbircan21@yandex.com",
                 Username = "fasetto",
@@ -65,7 +68,7 @@ namespace DevNots.Application.Tests
             userRepoMock.Setup(x => x.CreateAsync(It.IsAny<User>()))
                 .Returns(Task.FromResult("id"));
 
-            var user = new UserDto()
+            var user = new RegisterUserRequest()
             {
                 Email    = email,
                 Username = username,
@@ -88,7 +91,7 @@ namespace DevNots.Application.Tests
                 .Returns(Task.FromResult(true));
 
             // Act
-            var response = await userService.DeleteUserAsync(new DeleteUserDto()
+            var response = await userService.DeleteUserAsync(new DeleteUserRequest()
             {
                 Id = "valid-user-id",
             });
@@ -105,7 +108,7 @@ namespace DevNots.Application.Tests
                 .Returns(Task.FromResult(false));
 
             // Act
-            var response = await userService.DeleteUserAsync(new DeleteUserDto()
+            var response = await userService.DeleteUserAsync(new DeleteUserRequest()
             {
                 Id = "invalid-user-id",
             });
@@ -113,26 +116,6 @@ namespace DevNots.Application.Tests
             // Assert
             Assert.NotNull(response.Error);
             Assert.Equal(404, response.Error.StatusCode);
-        }
-
-
-        [Fact]
-        public async Task GetUsersAsync_ReturnsListOfUsers()
-        {
-            // Arrange
-            userRepoMock.Setup(x => x.PaginateAsync(1, 10))
-                .Returns(Task.FromResult(new List<User>().AsEnumerable()));
-
-            // Act
-            var response = await userService.GetUsersAsync(new UserListDto()
-            {
-                Limit = 20,
-            });
-
-            // Assert
-            Assert.Null(response.Error);
-            Assert.NotNull(response.Result);
-
         }
     }
 }

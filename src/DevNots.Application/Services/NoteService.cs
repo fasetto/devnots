@@ -1,52 +1,57 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.Note;
+using DevNots.Application.Validations;
 using DevNots.Domain;
-using DevNots.Domain.Note;
-using FluentValidation;
 
 namespace DevNots.Application.Services
 {
     public class NoteService:AppService
     {
-        private readonly INoteRepository noteRepository;
         private readonly IMapper mapper;
-        private readonly IValidator<NoteDto> validator;
+        private readonly INoteRepository noteRepository;
+        private readonly UpdateNoteValidator updateNoteValidator;
+        private readonly AddNoteValidator addNoteValidator;
 
-        public NoteService(INoteRepository noteRepository, IMapper mapper, IValidator<NoteDto> validator)
+        public NoteService(
+            IMapper mapper,
+            INoteRepository noteRepository,
+            AddNoteValidator addNoteValidator,
+            UpdateNoteValidator updateNoteValidator
+        )
         {
-            this.noteRepository = noteRepository;
             this.mapper = mapper;
-            this.validator = validator;
+            this.noteRepository = noteRepository;
+            this.addNoteValidator = addNoteValidator;
+            this.updateNoteValidator = updateNoteValidator;
         }
 
-        public async Task<AppResponse<string>> CreateNoteAsync(NoteDto noteDto)
+        public async Task<AppResponse<string>> CreateNoteAsync(AddNoteRequest request)
         {
-            var validationResult = validator.Validate(noteDto);
+            var validationResult = addNoteValidator.Validate(request);
             var response = new AppResponse<string>();
 
             if (validationResult.Errors.Count > 0)
             {
-                var errorMessage = validationResult.Errors.SingleOrDefault().ErrorMessage;
+                var errorMessage = validationResult.Errors.FirstOrDefault().ErrorMessage;
                 return ErrorResponse(errorMessage, 400, response);
             }
 
-            var _note = mapper.Map<Note>(noteDto);
-            var id = await noteRepository.CreateAsync(_note);
+            var note = mapper.Map<Note>(request);
+            var id = await noteRepository.CreateAsync(note);
 
             response.Result = id;
             return response;
         }
 
-        public async Task<AppResponse> DeleteNoteAsync(DeleteNoteDto request)
+        public async Task<AppResponse> DeleteNoteAsync(DeleteNoteRequest request)
         {
             var response = new AppResponse();
+
+            if (string.IsNullOrEmpty(request.Id))
+                return ErrorResponse("Id can not be empty.", 400, response);
 
             var isSuccess = await noteRepository.RemoveAsync(request.Id);
 
@@ -59,9 +64,12 @@ namespace DevNots.Application.Services
             return response;
         }
 
-        public async Task<AppResponse<IEnumerable<NoteDto>>> GetNotesAsync(NoteListDto request)
+        public async Task<AppResponse<IEnumerable<NoteResponse>>> GetNotesAsync(GetNoteListRequest request)
         {
-            var response = new AppResponse<IEnumerable<NoteDto>>();
+            var response = new AppResponse<IEnumerable<NoteResponse>>();
+
+            if (string.IsNullOrEmpty(request.UserId))
+                return ErrorResponse("UserId can not be empty.", 400, response);
 
             if (request.Limit > 49 || request.Limit < 1)
             {
@@ -72,9 +80,9 @@ namespace DevNots.Application.Services
             return await PaginateAsync(1, request.Limit);
         }
 
-        public async Task<AppResponse<IEnumerable<NoteDto>>> PaginateAsync(int page, int pageSize)
+        public async Task<AppResponse<IEnumerable<NoteResponse>>> PaginateAsync(int page, int pageSize)
         {
-            var response = new AppResponse<IEnumerable<NoteDto>>();
+            var response = new AppResponse<IEnumerable<NoteResponse>>();
 
             if (pageSize > 49)
             {
@@ -82,15 +90,15 @@ namespace DevNots.Application.Services
                 return ErrorResponse(errorMessage, 400, response);
             }
 
-            var users = await noteRepository.PaginateAsync(page, pageSize);
+            var notes = await noteRepository.PaginateAsync(page, pageSize);
 
-            response.Result = mapper.Map<IEnumerable<NoteDto>>(users);
+            response.Result = mapper.Map<IEnumerable<NoteResponse>>(notes);
             return response;
         }
 
-        public async Task<AppResponse<bool>> UpdateNoteAsync(NoteDto noteDto)
+        public async Task<AppResponse<bool>> UpdateNoteAsync(UpdateNoteRequest request)
         {
-            var validationResult = validator.Validate(noteDto);
+            var validationResult = updateNoteValidator.Validate(request);
             var response = new AppResponse<bool>();
 
             if (validationResult.Errors.Any())
@@ -99,11 +107,8 @@ namespace DevNots.Application.Services
                 return ErrorResponse(errorMessage, 400, response);
             }
 
-            if (string.IsNullOrEmpty(noteDto.Id))
-                return ErrorResponse("Id can not be empty.", 400, response);
-
-            var note = mapper.Map<Note>(noteDto);
-            var isUpdated = await noteRepository.UpdateAsync(noteDto.Id, note);
+            var note = mapper.Map<Note>(request);
+            var isUpdated = await noteRepository.UpdateAsync(request.Id, note);
 
             response.Result = isUpdated;
             return response;

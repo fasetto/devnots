@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.User;
 using DevNots.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,12 +17,12 @@ namespace DevNots.RestApi.Controllers
         /// <summary>
         /// Register an User
         /// </summary>
-        /// <param name="user">User Object</param>
+        /// <param name="request">User Object</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromBody] UserDto user)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserRequest request)
         {
-            var response = await userService.RegisterAsync(user);
+            var response = await userService.RegisterAsync(request);
 
             if (response.Error != null)
                 return StatusCode(response.Error.StatusCode, response.Error);
@@ -36,7 +35,7 @@ namespace DevNots.RestApi.Controllers
         /// <param name="request">DeleteUserDto Object</param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserDto request)
+        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserRequest request)
         {
             var response = await userService.DeleteUserAsync(request);
 
@@ -45,31 +44,14 @@ namespace DevNots.RestApi.Controllers
 
             return Ok(new { message = "User deleted."});
         }
-        /// <summary>
-        /// Get List of Users
-        /// </summary>
-        /// <param name="limit">Set the user limit  ( Default limit = 20 )</param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery] int limit = 20)
-        {
-            var response = await userService.GetUsersAsync(new UserListDto()
-            {
-                Limit = limit,
-            });
 
-            if (response.Error != null)
-                return StatusCode(response.Error.StatusCode, response.Error.Message);
-
-            return Ok(response.Result);
-        }
         /// <summary>
         /// Update the User
         /// </summary>
         /// <param name="request">User Object</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDto request)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
         {
             var response = await userService.UpdateUserAsync(request);
 

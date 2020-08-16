@@ -1,11 +1,6 @@
 using AutoMapper;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.Keyword;
-using DevNots.Application.Contracts.Note;
-using DevNots.Application.Contracts.User;
 using DevNots.Domain;
-using DevNots.Domain.Keyword;
-using DevNots.Domain.Note;
 
 namespace DevNots.Application.Mapping
 {
@@ -13,9 +8,13 @@ namespace DevNots.Application.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<UserDto, User>().ReverseMap();
-            CreateMap<NoteDto, Note>().ReverseMap();
-            CreateMap<KeywordDto, Keyword>().ReverseMap();
+            CreateMap<User, UserResponse>();
+            CreateMap<RegisterUserRequest, User>(MemberList.Source);
+            CreateMap<UpdateUserRequest, User>(MemberList.Source);
+
+            CreateMap<Note, NoteResponse>();
+            CreateMap<AddNoteRequest, Note>(MemberList.Source);
+            CreateMap<UpdateNoteRequest, Note>(MemberList.Source);
         }
     }
 }

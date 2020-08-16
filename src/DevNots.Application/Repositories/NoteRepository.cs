@@ -1,9 +1,7 @@
 using DevNots.Domain;
-using DevNots.Domain.Note;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DevNots.Application.Repositories

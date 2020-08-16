@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DevNots.Application.Contracts;
-using DevNots.Application.Contracts.Note;
 using DevNots.Application.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevNots.RestApi.Controllers
@@ -14,69 +9,75 @@ namespace DevNots.RestApi.Controllers
     [ApiController]
     public class NoteController : ControllerBase
     {
-        private readonly NoteService _noteService;
-
+        private readonly NoteService noteService;
         public NoteController(NoteService noteService)
         {
-            _noteService = noteService;
+            this.noteService = noteService;
         }
+
         /// <summary>
-        /// Create a note 
+        /// Create a note
         /// </summary>
         /// <param name="note">Note object</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateNote([FromBody] NoteDto note)
+        [ProducesResponseType(201)]
+        public async Task<IActionResult> CreateNote([FromBody] AddNoteRequest request)
         {
-            var response = await _noteService.CreateNoteAsync(note);
+            var response = await noteService.CreateNoteAsync(request);
 
             if (response.Error != null)
                 return StatusCode(response.Error.StatusCode, response.Error);
 
             return StatusCode(201, new { id = response.Result });
         }
+
         /// <summary>
         /// Delete the note
         /// </summary>
         /// <param name="note">DeleteNoteDto object</param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> DeleteNote([FromBody] DeleteNoteDto note)
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> DeleteNote([FromBody] DeleteNoteRequest note)
         {
-            var response = await _noteService.DeleteNoteAsync(note);
+            var response = await noteService.DeleteNoteAsync(note);
 
             if (response.Error != null)
                 return StatusCode(response.Error.StatusCode, response.Error);
 
             return Ok(new { message = "Note deleted." });
         }
+
         /// <summary>
         /// Get list of Notes
         /// </summary>
         /// <param name="limit">Set the note limit  ( Default limit = 20 )</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetNotes([FromQuery] int limit = 20)
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetNotes([FromBody] GetNoteListRequest request)
         {
-            var response = await _noteService.GetNotesAsync(new NoteListDto()
-            {
-                Limit = limit,
-            });
+            var response = await noteService.GetNotesAsync(request);
 
             if (response.Error != null)
                 return StatusCode(response.Error.StatusCode, response.Error.Message);
 
             return Ok(response.Result);
         }
+
         /// <summary>
         /// Update the note
         /// </summary>
         /// <param name="note">Note Object</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> UpdateNote([FromBody]NoteDto note)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteRequest request)
         {
-            var response = await _noteService.UpdateNoteAsync(note);
+            var response = await noteService.UpdateNoteAsync(request);
 
             if (response.Error != null)
                 return StatusCode(response.Error.StatusCode, response.Error.Message);

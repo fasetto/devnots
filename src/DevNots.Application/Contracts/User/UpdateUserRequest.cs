@@ -1,9 +1,6 @@
-using System;
-using DevNots.Domain;
-
-namespace DevNots.Application.Contracts.User
+namespace DevNots.Application.Contracts
 {
-    public class UserDto : IUserDetails
+    public class UpdateUserRequest
     {
         public string Id { get; set; }
         public string FirstName { get; set; }
@@ -11,6 +8,5 @@ namespace DevNots.Application.Contracts.User
         public string Email { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
