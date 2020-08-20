@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -45,6 +46,8 @@ namespace DevNots.Application.Services
             }
 
             var user = mapper.Map<User>(request);
+            user.CreatedAt = DateTime.UtcNow;
+
             var id = await userRepository.CreateAsync(user);
 
             response.Result = id;

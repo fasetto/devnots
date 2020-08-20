@@ -10,9 +10,12 @@ namespace DevNots.RestApi.Controllers
     public class NoteController : ControllerBase
     {
         private readonly NoteService noteService;
-        public NoteController(NoteService noteService)
+        private readonly TagService tagService;
+
+        public NoteController(NoteService noteService, TagService tagService)
         {
             this.noteService = noteService;
+            this.tagService = tagService;
         }
 
         /// <summary>
@@ -21,7 +24,6 @@ namespace DevNots.RestApi.Controllers
         /// <param name="note">Note object</param>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(201)]
         public async Task<IActionResult> CreateNote([FromBody] AddNoteRequest request)
         {
             var response = await noteService.CreateNoteAsync(request);
@@ -38,7 +40,6 @@ namespace DevNots.RestApi.Controllers
         /// <param name="note">DeleteNoteDto object</param>
         /// <returns></returns>
         [HttpDelete]
-        [ProducesResponseType(200)]
         public async Task<IActionResult> DeleteNote([FromBody] DeleteNoteRequest note)
         {
             var response = await noteService.DeleteNoteAsync(note);
@@ -55,7 +56,6 @@ namespace DevNots.RestApi.Controllers
         /// <param name="limit">Set the note limit  ( Default limit = 20 )</param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(200)]
         public async Task<IActionResult> GetNotes([FromBody] GetNoteListRequest request)
         {
             var response = await noteService.GetNotesAsync(request);
@@ -66,15 +66,13 @@ namespace DevNots.RestApi.Controllers
             return Ok(response.Result);
         }
 
+
         /// <summary>
         /// Update the note
         /// </summary>
         /// <param name="note">Note Object</param>
         /// <returns></returns>
         [HttpPut]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(400)]
         public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteRequest request)
         {
             var response = await noteService.UpdateNoteAsync(request);

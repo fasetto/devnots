@@ -15,6 +15,9 @@ namespace DevNots.Application.Mapping
             CreateMap<Note, NoteResponse>();
             CreateMap<AddNoteRequest, Note>(MemberList.Source);
             CreateMap<UpdateNoteRequest, Note>(MemberList.Source);
+
+            CreateMap<Tag, TagResponse>();
+            CreateMap<CreateTagRequest, Tag>(MemberList.Source);
         }
     }
 }

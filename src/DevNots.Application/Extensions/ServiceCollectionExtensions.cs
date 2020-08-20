@@ -37,6 +37,9 @@ namespace DevNots.Application.Extensions
                 .AddScoped<IUserRepository, UserRepository>()
                 .AddScoped<UserService>()
 
+                .AddScoped<ITagRepository, TagRepository>()
+                .AddScoped<CreateTagValidator>()
+
                 .AddScoped<AddNoteValidator>()
                 .AddScoped<UpdateNoteValidator>()
                 .AddScoped<INoteRepository, NoteRepository>()

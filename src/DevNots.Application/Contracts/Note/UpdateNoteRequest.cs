@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using DevNots.Domain;
+
 namespace DevNots.Application.Contracts
 {
     public class UpdateNoteRequest
@@ -7,6 +10,6 @@ namespace DevNots.Application.Contracts
         public string Text { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Keywords { get; set; }
+        public IEnumerable<Tag> TagList { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using DevNots.Domain;
 using MongoDB.Driver;
+using Tag = DevNots.Domain.Tag;
 
 namespace DevNots.MongoDb
 {
@@ -7,6 +8,7 @@ namespace DevNots.MongoDb
     {
         public override IDbCollection<User> Users => new UserCollection(database.GetCollection<User>("Users"));
         public override IDbCollection<Note> Notes => new NoteCollection(database.GetCollection<Note>("Notes"));
+        public override IDbCollection<Tag> Tags => new TagCollection(database.GetCollection<Tag>("Tags"));
 
         private readonly MongoClient client;
         private readonly IMongoDatabase database;

@@ -3,7 +3,6 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 
@@ -11,8 +10,7 @@ namespace DevNots.MongoDb
 {
     public class NoteCollection:IDbCollection<Note>
     {
-        IMongoCollection<Note> collection;
-
+        private readonly IMongoCollection<Note> collection;
         public NoteCollection(IMongoCollection<Note> collection)
         {
             this.collection = collection;
@@ -20,19 +18,19 @@ namespace DevNots.MongoDb
 
         public async Task<Note> GetByIdAsync(string id)
         {
-            var _note = await collection.FindAsync(filter =>filter.Id == id).ConfigureAwait(false);
-            return _note.SingleOrDefault();
+            var note = await collection.FindAsync(x => x.Id == id).ConfigureAwait(false);
+            return note.FirstOrDefault();
         }
 
         public async Task<IEnumerable<Note>> PaginateAsync(int page, int pageSize)
         {
-            var users = collection.Aggregate()
+            var notes = collection.Aggregate()
                 .Match(FilterDefinition<Note>.Empty)
                 .SortByDescending(x => x.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize);
 
-            return await users.ToListAsync();
+            return await notes.ToListAsync();
         }
 
         public async Task<string> CreateAsync(Note aggregate)
@@ -59,8 +57,8 @@ namespace DevNots.MongoDb
             if (!isValidId)
                 return false;
 
-            var _note =await collection.ReplaceOneAsync(x => x.Id == id, aggregate);
-            return _note.IsModifiedCountAvailable;
+            var note = await collection.ReplaceOneAsync(x => x.Id == id, aggregate);
+            return note.ModifiedCount > 0;
         }
 
         public async Task<IEnumerable<Note>> FindAsync(Expression<Func<Note, bool>> predicate)
@@ -72,7 +70,7 @@ namespace DevNots.MongoDb
         public async Task<Note> FindOneAsync(Expression<Func<Note, bool>> predicate)
         {
             var notes = await collection.FindAsync(predicate).ConfigureAwait(false);
-            return notes.SingleOrDefault();
+            return notes.FirstOrDefault();
         }
     }
 }

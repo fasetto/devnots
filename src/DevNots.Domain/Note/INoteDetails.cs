@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DevNots.Domain
@@ -8,7 +9,7 @@ namespace DevNots.Domain
         string Text { get; }
         string Title { get; }
         string Description { get; }
-        IEnumerable<string> Keywords { get; }
-
+        DateTime CreatedAt { get; }
+        IEnumerable<Tag> TagList { get; }
     }
 }

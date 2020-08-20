@@ -16,7 +16,6 @@ namespace DevNots.Domain
             Email = email;
             Username = username;
             Password = password;
-            CreatedAt = DateTime.UtcNow;
         }
 
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using DevNots.Domain;
 
 namespace DevNots.Application.Services
 {
-    public class NoteService:AppService
+    public class NoteService: AppService
     {
         private readonly IMapper mapper;
         private readonly INoteRepository noteRepository;
@@ -40,6 +41,8 @@ namespace DevNots.Application.Services
             }
 
             var note = mapper.Map<Note>(request);
+            note.CreatedAt = DateTime.UtcNow;
+
             var id = await noteRepository.CreateAsync(note);
 
             response.Result = id;
